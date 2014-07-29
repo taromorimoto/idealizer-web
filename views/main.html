@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+    <p>An interactive system for comparing and finding better practices.</p>
+
+    <div class="pure-g">
+    {% for thing in things %}
+        <div class="pure-u-1-5">
+            <div class="idea-thing">
+                <a href="/thing/{{ thing.key.id() }}">
+                    <img class="pure-img" src="/s/img/learning_maths.jpg">
+                </a>
+                <div class="idea-title">
+                    <a href="/thing/{{ thing.key.id() }}">{{ thing.name }}</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/s/css/pure/0.5.0/base.css">
+    <link rel="stylesheet" href="/s/css/pure/0.5.0/pure.css">
+    <link rel="stylesheet" href="/s/font-awesome-4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/s/css/main.css">
+    <title>{% block title %}{% endblock %} - Idealizer</title>
+    <script src="/s/js/jquery-2.1.1.js"></script>
+    <script src="/s/js/underscore.js"></script>
+    <script src="/s/js/backbone.js"></script>
+    <script src="/s/js/practices.js"></script>
+    <script src="/s/js/things.js"></script>
+    <script src="/s/js/idea.js"></script>
+</head>
+
+<body>
+
+<div id="layout">
+    <div id="main">
+        <div class="head">
+            <div class="pure-g">
+                <div class="pure-u-2-3">
+                    <nav role="navigation">
+                        <div class="pure-menu pure-menu-open pure-menu-horizontal idea-menu">
+                            <a href="/" class="pure-menu-heading"><h1>Idealizer</h1></a>
+
+                            <ul>
+                                <li class="pure-menu-selected"><a href="/">All</a></li>
+                                <li><a href="/new">Add</a></li>
+                                <li><a href="/practices">Practices</a></li>
+                                <li><a href="/">Find</a></li>
+                                <li><a href="/">Blog</a></li>
+                                <li><a href="/">About</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <div class="pure-u-1-3">
+                    <form class="pure-form idea-search-form">
+                        <input type="text" placeholder="Search" class="pure-input-rounded">
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">{% block content %}{% endblock %}</div>
+
+        <div class="footer">
+        {% block footer %}
+            &copy; Copyright 2014 by <a href="#">Idealizer</a>.
+        {% endblock %}
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var Idea = new IdeaView;
+    {% block script %}{% endblock %}
+})
+</script>
+
+</body>
+</html>

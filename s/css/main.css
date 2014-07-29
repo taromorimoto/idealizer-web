@@ -1,0 +1,157 @@
+body {
+    background: #fff;
+}
+body,
+input,
+textarea,
+.pure-g [class *="pure-u"] {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
+}
+
+select {
+    -webkit-appearance: menulist;
+    appearance: menulist;
+    height: 2em;
+}
+
+h1, h2, h3, h4 {
+    font-weight: normal;
+}
+
+nav {
+
+}
+    nav ul {
+        padding: 0;
+    }
+    nav li {
+        list-style: none;
+        display: inline-block;
+    }
+    nav a {
+        text-decoration: none;
+    }
+
+.button-small {
+    font-size: 75%;
+}
+.button-delete {
+    background-color: #c00;
+    color: white;
+}
+.button-add {
+    background-color: #1c2;
+    color: white;
+}
+
+/* Helpers */
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}
+.hidden {
+    display: none;
+}
+
+/* Layout */
+#layout {
+    background: #f9f9f9;
+}
+
+/* Top bar with menu and search box */
+.head {
+    background-color: #fff;
+    padding: 5px 10px 5px 0px;
+    border-bottom: 1px solid #999;
+}
+    .idea-menu > .pure-menu-heading {
+        text-transform: none;
+        color: #000;
+    }
+    .idea-menu h1 {
+        margin: 0 0 5px 0;
+    }
+    .idea-search-form {
+        float: right;
+    }
+
+.content {
+    margin: 0 auto;
+    padding: 0 2em;
+    max-width: 960px;
+    margin-bottom: 50px;
+    line-height: 1.6em;
+}
+
+.footer {
+    background-color: #fff;
+    padding: 0.8em 2em;
+}
+
+/* Displaying a things in a grid */
+.idea-thing {
+    display: inline-block;
+    margin: 5px;
+    border-radius: 1px;
+    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
+    background: #fff;
+    overflow: hidden;
+}
+    .idea-thing a {
+        display: block;
+        text-decoration: none;
+        color: #000;
+    }
+    .idea-title {
+        padding: 5px 3px;
+    }
+    .idea-thing img {
+        display: block;
+    }
+
+/* A form for adding new things */
+.idea-form input[type="checkbox"] {
+    margin-bottom: 0.2em;
+}
+    #idea-image-uploads {
+        border-top: 1px solid #eee;
+        margin: 10px 0;
+    }
+        .idea-upload-controls {
+            padding: 5px;
+            background-color: #fff;
+            text-align: center;
+        }
+            #idea-image-upload {
+                display: none;
+            }
+
+
+/* A form for modifying practices */
+#idea-practice-properties > fieldset > * {
+    margin-right: 5px;
+}
+
+/* Elements for making a grid with square elements */
+.idea-square-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+}
+    .idea-square-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        overflow: hidden;
+    }
+        .idea-square-container > * {
+            width: inherit;
+            height: initial;
+        }
+

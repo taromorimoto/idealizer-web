@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Add a new thing{% endblock %}
+
+{% block content %}
+
+    <form class="pure-form pure-form-stacked idea-form" action="/upload" method="post" enctype="multipart/form-data">
+        <fieldset>
+            <legend>Add a new thing</legend>
+            <fieldset class="pure-group">
+                <label>Practice</label>
+                <select id="idea-practice-selector"></select>
+            </fieldset>
+
+            <fieldset class="pure-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Name..." required>
+            </fieldset>
+
+            <fieldset class="pure-group">
+                <label>Images</label>
+                <div class="pure-g" id="idea-image-uploads">
+                    <div class="pure-u-1-6">
+                        <div class="idea-square-wrapper">
+                            <div class="idea-square-container idea-upload-controls">
+                                <p>Upload images</p>
+                                <button type="button" class="pure-button">Select</button>
+                                <input class="pure-button" type="file" id="idea-image-upload" name="image" upload_url="{{ upload_url }}" multiple>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="pure-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Description..."></textarea>
+            </fieldset>
+
+            <label for="private" class="pure-checkbox">
+                <input id="private" name="private" type="checkbox" value=""> Private, only visible to you.
+            </label>
+
+            <button class="pure-button pure-button-primary" type="submit">Add</button>
+
+        </fieldset>
+    </form>
+    
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Practices{% endblock %}
+
+{% block content %}
+
+<div id="edit-practice"></div>
+
+<script type="text/template" id="edit-practice-template">
+    <h2>Edit Practice</h2>
+
+    <form class="pure-form idea-form hidden" id="edit-practice-form">
+        <fieldset>
+            <select id="practice-selector"></select>
+            <button class="pure-button button-delete delete-practice" type="button">Delete Practice</button>
+            &nbsp;
+            <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
+        </fieldset>
+
+        <legend>Settings</legend>
+        <fieldset>
+            <input type="text" name="practice-name" placeholder="Practice name..." value="<%= name %>" required>
+        </fieldset>
+
+        <legend>Properties</legend>
+        <div id="edit-practice-properties"></div>
+        <button class="pure-button button-add" type="button">Add new property</button>
+
+        <fieldset>
+            <legend></legend>
+            <button class="pure-button pure-button-primary">Save Practice</button>
+            &nbsp;
+            <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
+        </fieldset>
+    </form>
+</script>
+
+<script type="text/template" id="edit-practice-property-template">
+    <fieldset>
+        <input type="text" name="property-name" value="' + prop.name + '" placeholder="Property name..." required>
+        <select name="property-type">
+            <option value="<%= type %>"><%= type %></option>
+        </select>
+        <button class="pure-button button-small button-delete" type="button">Delete</button>
+    </fieldset>
+</script>
+
+{% endblock %}
+
+
+{% block script %}
+//idea.practices.loadAll()
+{% endblock %}
