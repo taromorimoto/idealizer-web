@@ -4,22 +4,15 @@
 
 {% block content %}
 
+<h2>Edit Practice</h2>
+<div id="practice-selector"></div>
 <div id="edit-practice"></div>
 
 <script type="text/template" id="edit-practice-template">
-    <h2>Edit Practice</h2>
-
-    <form class="pure-form idea-form hidden" id="edit-practice-form">
-        <fieldset>
-            <select id="practice-selector"></select>
-            <button class="pure-button button-delete delete-practice" type="button">Delete Practice</button>
-            &nbsp;
-            <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
-        </fieldset>
-
+    <form class="pure-form idea-form" id="edit-practice-form">
         <legend>Settings</legend>
         <fieldset>
-            <input type="text" name="practice-name" placeholder="Practice name..." value="<%= name %>" required>
+            <input type="text" class="practice-name" placeholder="Practice name..." value="<%= name %>" required>
         </fieldset>
 
         <legend>Properties</legend>
@@ -28,16 +21,27 @@
 
         <fieldset>
             <legend></legend>
-            <button class="pure-button pure-button-primary">Save Practice</button>
+            <button class="pure-button pure-button-primary" type="button">Save Practice</button>
             &nbsp;
             <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
         </fieldset>
     </form>
 </script>
 
+<script type="text/template" id="practice-selector-template">
+    <form class="pure-form">
+        <select>
+            <% _.each(practices, function(practice) { %> <option value="<%= practice.key %>"><%= practice.name %></li> <% }); %>
+        </select>
+        <button class="pure-button button-delete" type="button">Delete Practice</button>
+        &nbsp;
+        <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
+    </form>
+</script>
+
 <script type="text/template" id="edit-practice-property-template">
     <fieldset>
-        <input type="text" name="property-name" value="' + prop.name + '" placeholder="Property name..." required>
+        <input type="text" name="property-name" value="<%= name %>" placeholder="Property name..." required>
         <select name="property-type">
             <option value="<%= type %>"><%= type %></option>
         </select>
@@ -49,5 +53,5 @@
 
 
 {% block script %}
-//idea.practices.loadAll()
+idea.renderPractices()
 {% endblock %}

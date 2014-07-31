@@ -1,126 +1,192 @@
-/**
- * Practice has many Things. Things have one practice.
- */
-var Practice = Backbone.Model.extend({
+$(function(){
+    /**
+     * Practice has many Things. Things have one practice.
+     */
+    Idea.Practice = Backbone.Model.extend({
 
-    // Default attributes for a Practice.
-    defaults: function() {
-        return {
-            key = '',
-            name = '',
-            properties = [],
+        urlRoot: '/practice',
+
+        // Default attributes for a Practice.
+        defaults: function() {
+            return {
+                key: '',
+                name: '',
+                properties: [],
+            }
+        },
+
+    })
+
+    Idea.PracticeCollection = Backbone.Collection.extend({
+        model: Idea.Practice,
+        url: '/practices/all',
+
+        add: function(models, options) {
+            _.each(models, function(model) {
+                model.id = model.key
+            })
+
+            Backbone.Collection.prototype.add.call(this, models, options);
         }
-    },
+    })
+
+
+
+    Idea.EditPracticeView = Backbone.View.extend({
+
+        el: '#edit-practice',
+
+        template: _.template($('#edit-practice-template').html()),
+
+        events: {
+            "click button:last"   : "save",
+            "change .practice-name"   : "setName"
+        },
+
+        initialize: function(options) {
+
+            this.listenTo(this.model, 'change', this.render)
+            this.listenTo(this.model, 'destroy', this.remove)
+
+            var self = this
+            this.selectorView = options.selectorView
+            this.selectorView.on('change', function(practice) {
+                console.log(practice)
+                self.model = practice
+                self.render()
+            })
+
+            this.render()
+
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.model ? this.model.toJSON() : undefined))
+
+            this.$form = this.$('#edit-practice-form').submit(function(e) {
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+            })
+            this.$properties = this.$('#edit-practice-properties')
+
+            if (this.model) {
+
+                // Render properties
+                this.propertyViews = []
+                _.each(this.model.get('properties'), function(property, index) {
+                    var view = new Idea.PracticePropertyView({ property: property })
+                    this.propertyViews.push(view)
+                    this.$properties.append(view.$el)
+                    view.on('remove', function() {
+                        console.log('Removing property at index ' + index, property)
+                        this.propertyViews.splice(index, 1)
+                        this.model.get('properties').splice(index, 1)
+                    }.bind(this))
+                }.bind(this))
+
+
+            }
+
+            return this
+        },
+
+        setName: function(e) {
+            this.model.set({ name: $(e.target).val() })
+        },
+
+        saveSpinner: function(show) {
+            this.$form.find('.idea-load-spin:last').toggle(show == true)
+        },
+
+        save: function() {
+            console.log('Saving Practice', this.model)
+            this.saveSpinner(true)
+            this.model.save().always(function() {
+                this.saveSpinner(false)
+            }.bind(this))
+        },
+
+        clear: function() {
+            this.model.destroy()
+        }
+
+    })
+
+    Idea.PracticePropertyView = Backbone.View.extend({
+
+        template: _.template($('#edit-practice-property-template').html()),
+
+        events: {
+            "change select"   : "setType",
+            "change input"   : "setName",
+            "click button"   : "remove"
+        },
+
+        initialize: function(options) {
+            this.property = options.property
+            this.render()
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.property))
+        },
+
+        setType: function(e) {
+            this.property.type = $(e.target).val()
+        },
+
+        setName: function(e) {
+            this.property.name = $(e.target).val()
+        },
+
+        remove: function() {
+            this.trigger('remove')
+            Backbone.View.prototype.remove.apply(this, arguments);
+        }
+    })
+
+    Idea.PracticeSelectorView = Backbone.View.extend({
+
+        el: '#practice-selector',
+
+        template: _.template($('#practice-selector-template').html()),
+
+        events: {
+            "change select"   : "select"
+        },
+
+        initialize: function() {
+            this.listenTo(this.collection, 'change', this.render)
+
+            this.render()
+        },
+
+        render: function() {
+            var practices = this.collection.toJSON()
+            practices.unshift({ name: 'Create new...' })
+            this.$el.html(this.template({ practices: practices }))
+
+            this.$select = this.$('select')
+            this.$delete = this.$('.button-delete')
+
+            return this
+        },
+
+        select: function() {
+            var practice = this.collection.get(this.$select.val())
+            console.log('Selected practice', practice)
+            this.trigger('change', practice)
+        }
+    })
 
 })
-
-var Practices = Backbone.Collection.extend({
-
-    // Reference to this collection's model.
-    model: Todo,
-
-    // Save all of the todo items under the `"todos-backbone"` namespace.
-    localStorage: new Backbone.LocalStorage("todos-backbone"),
-
-    // Filter down the list of all todo items that are finished.
-    done: function() {
-        return this.where({done: true});
-    },
-
-    // Filter down the list to only todo items that are still not finished.
-    remaining: function() {
-        return this.where({done: false});
-    },
-
-    // We keep the Todos in sequential order, despite being saved by unordered
-    // GUID in the database. This generates the next order number for new items.
-    nextOrder: function() {
-        if (!this.length) return 1;
-        return this.last().get('order') + 1;
-    },
-
-    // Todos are sorted by their original insertion order.
-    comparator: 'order'
-
-});
-
-
-// The DOM element for a todo item...
-var EditPracticeView = Backbone.View.extend({
-
-    el: $("#edit-practice"),
-
-    // Cache the template function for a single item.
-    practiceTemplate: _.template($('#edit-practice-template').html()),
-    propertyTemplate: _.template($('#edit-practice-property-template').html()),
-
-    // The DOM events specific to an item.
-    events: {
-        "click .toggle"   : "toggleDone",
-        "dblclick .view"  : "edit",
-        "click a.destroy" : "clear",
-        "keypress .edit"  : "updateOnEnter",
-        "blur .edit"      : "close"
-    },
-
-    // The TodoView listens for changes to its model, re-rendering. Since there's
-    // a one-to-one correspondence between a **Todo** and a **TodoView** in this
-    // app, we set a direct reference on the model for convenience.
-    initialize: function() {
-        this.$form = this.$('#edit-practice-form');
-        this.$properties = this.$('#edit-practice-properties');
-
-        this.listenTo(this.model, 'change', this.render);
-        this.listenTo(this.model, 'destroy', this.remove);
-    },
-
-    // Re-render the titles of the todo item.
-    render: function() {
-        this.$el.html(this.template(this.model.toJSON()));
-        this.$el.toggleClass('done', this.model.get('done'));
-        this.input = this.$('.edit');
-        return this;
-    },
-
-    // Toggle the `"done"` state of the model.
-    toggleDone: function() {
-        this.model.toggle();
-    },
-
-    // Switch this view into `"editing"` mode, displaying the input field.
-    edit: function() {
-        this.$el.addClass("editing");
-        this.input.focus();
-    },
-
-    // Close the `"editing"` mode, saving changes to the todo.
-    close: function() {
-        var value = this.input.val();
-        if (!value) {
-            this.clear();
-        } else {
-            this.model.save({title: value});
-            this.$el.removeClass("editing");
-        }
-    },
-
-    // If you hit `enter`, we're through editing the item.
-    updateOnEnter: function(e) {
-        if (e.keyCode == 13) this.close();
-    },
-
-    // Remove the item, destroy the model.
-    clear: function() {
-        this.model.destroy();
-    }
-
-});
-
 
 
 /**
  * Individual Practice class
  */
+ /*
 var Practice = function (data, options) {
     this.keyCounter = 1
 
@@ -237,3 +303,4 @@ Practice.prototype.createFieldset = function(prop) {
     return set.append(input, types, button)
 }
 
+*/

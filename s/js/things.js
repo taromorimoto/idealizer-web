@@ -3,17 +3,10 @@
  */
 var Thing = Backbone.Model.extend({
 
-    // Default attributes for a Thing.
     defaults: function() {
         return {
-            title: "empty todo...",
-            order: Todos.nextOrder(),
-            done: false
+            name: ''
         }
-    },
-
-    toggle: function() {
-        this.save({done: !this.get("done")})
     }
 
 })

@@ -3,14 +3,17 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} - Idealizer</title>
+
     <link rel="stylesheet" href="/s/css/pure/0.5.0/base.css">
     <link rel="stylesheet" href="/s/css/pure/0.5.0/pure.css">
     <link rel="stylesheet" href="/s/font-awesome-4.1.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="/s/css/main.css">
-    <title>{% block title %}{% endblock %} - Idealizer</title>
+
     <script src="/s/js/jquery-2.1.1.js"></script>
     <script src="/s/js/underscore.js"></script>
     <script src="/s/js/backbone.js"></script>
+    
     <script src="/s/js/practices.js"></script>
     <script src="/s/js/things.js"></script>
     <script src="/s/js/idea.js"></script>
@@ -18,8 +21,9 @@
 
 <body>
 
-<div id="layout">
+<div id="idea-view">
     <div id="main">
+    
         <div class="head">
             <div class="pure-g">
                 <div class="pure-u-2-3">
@@ -53,12 +57,14 @@
             &copy; Copyright 2014 by <a href="#">Idealizer</a>.
         {% endblock %}
         </div>
+
     </div>
 </div>
 
 <script>
+var idea = new Idea
 $(document).ready(function() {
-    var Idea = new IdeaView;
+    idea.init()
     {% block script %}{% endblock %}
 })
 </script>

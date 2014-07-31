@@ -29,6 +29,17 @@ class Practice(ndb.Model):
         query = Practice.query().order(-Practice.date)
         return query.fetch(100)
 
+    @classmethod
+    def decode(cls, data):
+        obj = cls()
+        obj.name = data['name']
+        obj.properties = [ThingProperty.decode(prop) for prop in data['properties']]
+        return obj
+
+    def decode(self, data):
+        self.name = data['name']
+        self.properties = [ThingProperty.decode(prop) for prop in data['properties']]
+
     def json(self):
         return {
             'key': self.key.id(),
@@ -63,14 +74,12 @@ class AllPractices(IdeaJSONHandler):
     def get(self):
         self.set_headers()
 
-        values = {}
+        values = []
         practices = Practice.all()
         for practice in practices:
-            values[practice.key.id()] = practice.json()
+            values.append(practice.json())
 
-        self.response.out.write(json.dumps({
-            'practices': values
-        }))
+        self.response.out.write(json.dumps(values))
 
 class SavePractice(IdeaJSONHandler):
 
@@ -99,6 +108,16 @@ class SavePractice(IdeaJSONHandler):
             'status': 'success',
             'practice': practice.json(),
         }))
+
+    def put(self, id):
+        self.set_headers()
+
+        print 'SavePractice:', self.request.body
+        data = json.loads(self.request.body)
+        practice = Practice.get_by_id(int(id))
+        practice.decode(data)
+        practice.put()
+
 
 class DeletePractice(IdeaJSONHandler):
 

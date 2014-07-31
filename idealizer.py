@@ -23,4 +23,6 @@ application = webapp2.WSGIApplication([
     ('/practices/save', SavePractice),
     ('/practices/delete', DeletePractice),
 
+    (r'/practice/(\d+)', SavePractice),
+
 ], debug=True)

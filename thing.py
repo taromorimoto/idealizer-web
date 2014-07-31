@@ -1,11 +1,17 @@
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-
 class ThingProperty(ndb.Expando):
 	name = ndb.StringProperty()
 	type = ndb.StringProperty()
 	thing = ndb.KeyProperty(kind='Thing')
+
+	@classmethod
+	def decode(cls, data):
+		obj = cls()
+		obj.name = data['name']
+		obj.type = data['type']
+		return obj
 
 	def json(self):
 		return {
