@@ -15,7 +15,16 @@ $(function(){
             }
         },
 
+        name: function() {
+            return this.get('name')
+        },
+
+        properties: function() {
+            return this.get('properties')
+        }
+
     })
+
 
     Idea.PracticeCollection = Backbone.Collection.extend({
         model: Idea.Practice,
@@ -23,13 +32,13 @@ $(function(){
 
         add: function(models, options) {
             _.each(models, function(model) {
-                model.id = model.key
+                if (model.key)
+                    model.id = model.key
             })
 
             Backbone.Collection.prototype.add.call(this, models, options);
         }
     })
-
 
 
     Idea.EditPracticeView = Backbone.View.extend({
@@ -40,28 +49,23 @@ $(function(){
 
         events: {
             "click button:last"   : "save",
+            "click .button-add"   : "newProperty",
             "change .practice-name"   : "setName"
         },
 
         initialize: function(options) {
-
-            this.listenTo(this.model, 'change', this.render)
-            this.listenTo(this.model, 'destroy', this.remove)
-
-            var self = this
-            this.selectorView = options.selectorView
-            this.selectorView.on('change', function(practice) {
-                console.log(practice)
-                self.model = practice
-                self.render()
-            })
-
             this.render()
+        },
 
+        setModel: function(model) {
+            this.model = model
+            this.render()
         },
 
         render: function() {
-            this.$el.html(this.template(this.model ? this.model.toJSON() : undefined))
+            console.log('EditPracticeView.render')
+
+            this.$el.html(this.template({ practice: this.model }))
 
             this.$form = this.$('#edit-practice-form').submit(function(e) {
                 e.preventDefault()
@@ -70,25 +74,32 @@ $(function(){
             })
             this.$properties = this.$('#edit-practice-properties')
 
-            if (this.model) {
-
-                // Render properties
-                this.propertyViews = []
-                _.each(this.model.get('properties'), function(property, index) {
-                    var view = new Idea.PracticePropertyView({ property: property })
-                    this.propertyViews.push(view)
-                    this.$properties.append(view.$el)
-                    view.on('remove', function() {
-                        console.log('Removing property at index ' + index, property)
-                        this.propertyViews.splice(index, 1)
-                        this.model.get('properties').splice(index, 1)
-                    }.bind(this))
-                }.bind(this))
-
-
-            }
+            // Render properties from model
+            this.propertyViews = []
+            _.each(this.model.properties(), this.appendProperty.bind(this))
 
             return this
+        },
+
+        newProperty: function() {
+            var property = {}
+            this.model.properties().push(property)
+            this.appendProperty(property)
+        },
+
+        appendProperty: function(property) {
+            _.defaults(property, { type: '', name: '' });
+            var view = new Idea.PracticePropertyView({ property: property })
+            var index = this.propertyViews.length
+            this.propertyViews.push(view)
+            this.$properties.append(view.$el)
+            this.listenTo(view, 'remove', function() {
+                var properties = this.model.get('properties')
+                index = properties.indexOf(property)
+                console.log('Removing property at index ' + index, property)
+                this.propertyViews.splice(index, 1)
+                properties.splice(index, 1)
+            }.bind(this))
         },
 
         setName: function(e) {
@@ -100,27 +111,34 @@ $(function(){
         },
 
         save: function() {
+            var self = this
+            var isNew = this.model.isNew()
             console.log('Saving Practice', this.model)
             this.saveSpinner(true)
-            this.model.save().always(function() {
-                this.saveSpinner(false)
-            }.bind(this))
-        },
-
-        clear: function() {
-            this.model.destroy()
+            this.model.save()
+                .done(function() { 
+                    if (isNew) self.trigger('sync:new-model')
+                    console.log('Saved Practice ', self.model)
+                })
+                .fail(function() { 
+                    console.log('Failed to save Practice ', self.model)
+                })
+                .always(function() {
+                    self.saveSpinner(false) 
+                })
         }
-
     })
 
     Idea.PracticePropertyView = Backbone.View.extend({
 
         template: _.template($('#edit-practice-property-template').html()),
 
+        types: ['text', 'textarea', 'select', 'radio', 'checkbox', 'image', 'video', 'link'],
+
         events: {
             "change select"   : "setType",
             "change input"   : "setName",
-            "click button"   : "remove"
+            "click .button-delete"   : "remove"
         },
 
         initialize: function(options) {
@@ -129,7 +147,7 @@ $(function(){
         },
 
         render: function() {
-            this.$el.html(this.template(this.property))
+            this.$el.html(this.template(_.defaults({ types: this.types }, this.property)))
         },
 
         setType: function(e) {
@@ -138,6 +156,13 @@ $(function(){
 
         setName: function(e) {
             this.property.name = $(e.target).val()
+        },
+
+        json: function() {
+            return {
+                name: this.$('input').val(),
+                type: this.$('select').val()
+            }
         },
 
         remove: function() {
@@ -157,15 +182,16 @@ $(function(){
         },
 
         initialize: function() {
-            this.listenTo(this.collection, 'change', this.render)
+            this.listenTo(this.collection, 'add', this.added)
+            this.listenTo(this.collection, 'sync', this.saved)
 
             this.render()
         },
 
         render: function() {
-            var practices = this.collection.toJSON()
-            practices.unshift({ name: 'Create new...' })
-            this.$el.html(this.template({ practices: practices }))
+            console.log('PracticeSelectorView.render')
+
+            this.$el.html(this.template({ practices: this.collection.models }))
 
             this.$select = this.$('select')
             this.$delete = this.$('.button-delete')
@@ -173,10 +199,24 @@ $(function(){
             return this
         },
 
+        added: function(model) {
+            if (model.isNew()) {
+                this.$select.prepend('<option value="' + model.cid + '">Create New...</option>')
+            }
+        },
+
+        saved: function(model) {
+            this.$select.find('option[value="' + model.cid + '"]').text(model.name())
+        },
+
         select: function() {
-            var practice = this.collection.get(this.$select.val())
-            console.log('Selected practice', practice)
-            this.trigger('change', practice)
+            this.model = this.selected()
+            console.log('Selected practice', this.model)
+            this.trigger('select', this.model)
+        },
+
+        selected: function() {
+            return this.collection.get(this.$select.val())
         }
     })
 

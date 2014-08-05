@@ -2,23 +2,29 @@
 var Idea = function() {
 }
 
+
 Idea.prototype.init = function() {
     var self = this
 
+    _.extend(this, Backbone.Events);
+
     // Load all practices
-    this.practices = new Idea.PracticeCollection
-    this.initDfd = this.practices.fetch({reset: true})
+    this.practices = new Idea.PracticeCollection()
+    this.initDfd = this.practices.fetch({ reset: true })
 }
 
 Idea.prototype.renderPractices = function() {
     this.initDfd.done(function() {
-        this.selectorView = new Idea.PracticeSelectorView({
-            collection: this.practices
-        })
-        this.editPracticeView = new Idea.EditPracticeView({
-            model: new Idea.Practice(),
-            selectorView: this.selectorView
-        })
+        this.practices.unshift(new Idea.Practice)
+        this.selectorView = new Idea.PracticeSelectorView({ collection: this.practices })
+
+        this.editPracticeView = new Idea.EditPracticeView({ model: this.selectorView.selected() })
+
+        this.listenTo(this.selectorView, 'select', this.editPracticeView.setModel.bind(this.editPracticeView))
+        this.listenTo(this.editPracticeView, 'sync:new-model', function() {
+            this.practices.unshift(new Idea.Practice)
+        }.bind(this))
+
     }.bind(this))
 }
 

@@ -30,7 +30,7 @@ class Practice(ndb.Model):
         return query.fetch(100)
 
     @classmethod
-    def decode(cls, data):
+    def create(cls, data):
         obj = cls()
         obj.name = data['name']
         obj.properties = [ThingProperty.decode(prop) for prop in data['properties']]
@@ -79,6 +79,7 @@ class AllPractices(IdeaJSONHandler):
         for practice in practices:
             values.append(practice.json())
 
+        print values
         self.response.out.write(json.dumps(values))
 
 class SavePractice(IdeaJSONHandler):
@@ -86,37 +87,25 @@ class SavePractice(IdeaJSONHandler):
     def post(self):
         self.set_headers()
 
-        data = json.loads(self.request.get('data'))
-        print 'SavePractice:', data
-
-        key = data['key']
-        if key:
-            practice = Practice.get_by_id(key)
-        else:
-            practice = Practice()
-
-        practice.name = data['name']
-        practice.properties = []
-
-        for p in data['properties']:
-            prop = ThingProperty(name = p['name'], type = p['type'])
-            practice.properties.append(prop)
-
+        print 'SavePractice (NEW):', self.request.body
+        practice = Practice.create(json.loads(self.request.body))
         practice.put()
 
         self.response.out.write(json.dumps({
-            'status': 'success',
-            'practice': practice.json(),
+            'id': practice.key.id()
         }))
 
     def put(self, id):
         self.set_headers()
 
         print 'SavePractice:', self.request.body
-        data = json.loads(self.request.body)
         practice = Practice.get_by_id(int(id))
-        practice.decode(data)
+        practice.decode(json.loads(self.request.body))
         practice.put()
+
+        self.response.out.write(json.dumps({
+            'id': practice.key.id()
+        }))
 
 
 class DeletePractice(IdeaJSONHandler):

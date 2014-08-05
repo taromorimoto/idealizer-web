@@ -12,7 +12,7 @@
     <form class="pure-form idea-form" id="edit-practice-form">
         <legend>Settings</legend>
         <fieldset>
-            <input type="text" class="practice-name" placeholder="Practice name..." value="<%= name %>" required>
+            <input type="text" class="practice-name" placeholder="Practice name..." value="<%= practice.name() %>" required>
         </fieldset>
 
         <legend>Properties</legend>
@@ -31,7 +31,9 @@
 <script type="text/template" id="practice-selector-template">
     <form class="pure-form">
         <select>
-            <% _.each(practices, function(practice) { %> <option value="<%= practice.key %>"><%= practice.name %></li> <% }); %>
+            <% _.each(practices, function(practice) { %>
+                <option value="<%= practice.cid %>"><%= practice.isNew() ? 'Create new...' : practice.get('name') %></option>
+            <% }) %>
         </select>
         <button class="pure-button button-delete" type="button">Delete Practice</button>
         &nbsp;
@@ -43,7 +45,9 @@
     <fieldset>
         <input type="text" name="property-name" value="<%= name %>" placeholder="Property name..." required>
         <select name="property-type">
-            <option value="<%= type %>"><%= type %></option>
+            <% _.each(types, function(t) { %>
+                <option value="<%= t %>" <% if (t == type) print('selected') %>><%= t %></option>
+            <% }) %>
         </select>
         <button class="pure-button button-small button-delete" type="button">Delete</button>
     </fieldset>
