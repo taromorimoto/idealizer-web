@@ -1,4 +1,4 @@
-import jinja2, os, webapp2
+import webapp2
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -7,15 +7,8 @@ from google.appengine.ext import blobstore
 
 import helpers
 
-
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
-
-
-thing_template = JINJA_ENVIRONMENT.get_template('thing.html')
-new_thing_template = JINJA_ENVIRONMENT.get_template('new_thing.html')
+thing_template = helpers.get_template('thing.html')
+new_thing_template = helpers.get_template('new_thing.html')
 
 
 class ThingProperty(ndb.Expando):
