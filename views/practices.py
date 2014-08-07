@@ -82,12 +82,12 @@ class AllPractices(IdeaJSONHandler):
         print values
         self.response.out.write(json.dumps(values))
 
-class SavePractice(IdeaJSONHandler):
+class UpdatePractice(IdeaJSONHandler):
 
     def post(self):
         self.set_headers()
 
-        print 'SavePractice (NEW):', self.request.body
+        print 'UpdatePractice (NEW):', self.request.body
         practice = Practice.create(json.loads(self.request.body))
         practice.put()
 
@@ -98,28 +98,24 @@ class SavePractice(IdeaJSONHandler):
     def put(self, id):
         self.set_headers()
 
-        print 'SavePractice:', self.request.body
+        print 'UpdatePractice (UPDATE):', self.request.body
         practice = Practice.get_by_id(int(id))
         practice.decode(json.loads(self.request.body))
         practice.put()
 
         self.response.out.write(json.dumps({
-            'id': practice.key.id()
+            'id': id
         }))
 
-
-class DeletePractice(IdeaJSONHandler):
-
-    def get(self):
+    def delete(self, id):
         self.set_headers()
 
-        key = int(self.request.get('key'))
-        print 'Deleting practice %d' % key
-
-        ndb.Key(Practice, key).delete()
+        print 'UpdatePractice (DELETE):', self.request.body
+        practice = Practice.get_by_id(int(id))
+        practice.key.delete()
 
         self.response.out.write(json.dumps({
-            'status': 'success',
-            'key': key,
+            'id': id
         }))
+
 

@@ -178,11 +178,13 @@ $(function(){
         template: _.template($('#practice-selector-template').html()),
 
         events: {
-            "change select"   : "select"
+            "change select"   : "select",
+            "click .button-delete"   : "delete"
         },
 
         initialize: function() {
             this.listenTo(this.collection, 'add', this.added)
+            this.listenTo(this.collection, 'destroy', this.destroyed)
             this.listenTo(this.collection, 'sync', this.saved)
 
             this.render()
@@ -209,138 +211,45 @@ $(function(){
             this.$select.find('option[value="' + model.cid + '"]').text(model.name())
         },
 
+        destroyed: function(model) {
+            this.$select.find('option[value="' + model.cid + '"]').remove()
+            this.$select.find('option:first').attr('selected', 'selected')
+            this.select()
+        },
+
         select: function() {
             this.model = this.selected()
             console.log('Selected practice', this.model)
+            this.$delete.toggle(!this.model.isNew())
             this.trigger('select', this.model)
         },
 
         selected: function() {
             return this.collection.get(this.$select.val())
+        },
+
+        delete: function() {
+            var self = this
+            this.model = this.selected()
+            console.log('Deleting practice', this.model)
+            this.spinner(true)
+            this.model.destroy()
+                .done(function() { 
+                    console.log('Deleted Practice ', self.model)
+                })
+                .fail(function() { 
+                    console.log('Failed to delete Practice ', self.model)
+                })
+                .always(function() {
+                    self.spinner(false) 
+                })
+        },
+
+        spinner: function(show) {
+            this.$('.idea-load-spin').toggle(show == true)
         }
+
     })
 
 })
 
-
-/**
- * Individual Practice class
- */
- /*
-var Practice = function (data, options) {
-    this.keyCounter = 1
-
-    data = data ? data : {}
-    this.key = data.key
-    this.name = data.name
-    this.properties = data.properties ? data.properties : []
-
-    this.$form = options.$form
-    this.$properties = this.$form.find('#idea-practice-properties')
-
-    this.init()
-}
-
-Practice.prototype.init = function() {
-    var self = this
-    this.$form.find('.button-add').off().click(function() {
-        self.addProperty()
-    })
-    this.$form.find('[name=practice-name]').off().val(this.name).change(function() {
-        self.name = $(this).val()
-    })
-
-    this.render()
-}
-
-Practice.prototype.clear = function() {
-    this.$properties.empty()
-}
-
-Practice.prototype.render = function() {
-    this.clear()
-    for (var i in this.properties) {
-        this.renderProperty(this.properties[i])
-    }
-}
-
-Practice.prototype.renderProperty = function(prop) {
-    var self = this
-    var fieldset = this.createFieldset(prop)
-    this.$properties.append(fieldset)
-}
-
-Practice.prototype.addProperty = function(name, type) {
-    var prop = {
-        key: this.keyCounter++,
-        name: name ? name : '',
-        type: type ? type : 'text'
-    }
-    this.properties.push(prop)
-    this.renderProperty(prop)
-}
-
-Practice.prototype.deleteProperty = function(key) {
-    var index
-    this.properties.some(function(prop, i) {
-        return prop.key == key && (index = i)
-    })
-    this.properties.splice(index, 1)
-    $("fieldset[key='" + key + "']", this.$properties).remove()
-}
-
-Practice.prototype.getProperty = function(key) {
-    var found
-    this.properties.some(function(prop, i) {
-        return prop.key == key && (found = prop)
-    })
-    return found
-}
-
-Practice.prototype.toJSON = function() {
-    return {
-        key: this.key ? this.key : '',
-        name: this.name,
-        properties: this.properties
-    }
-}
-
-Practice.prototype.stringify = function() {
-    return JSON.stringify(this.toJSON())
-}
-
-Practice.types = ['text', 'textarea', 'select', 'radio', 'checkbox', 'image', 'video', 'link']
-
-Practice.createTypeOptions = function(types) {
-    types = types ? types : Practice.types
-    var select = $('<select name="property-type"></select>')
-    for (var i in types) {
-        select.append('<option value="' + types[i] + '">' + types[i] + '</option>')
-    }
-    return select
-}
-
-Practice.prototype.createFieldset = function(prop) {
-    var self = this
-
-    var set = $('<fieldset></fieldset>').attr('key', prop.key)
-    var input = $('<input type="text" name="property-name" value="' + prop.name + '" placeholder="Property name..." required>')
-    var types = Practice.createTypeOptions().val(prop.type)
-    var button = $('<button class="pure-button button-small button-delete" type="button">Delete</button>')
-
-    button.click(function() {
-        self.deleteProperty(prop.key)
-    })
-
-    input.change(function() {
-        prop.name = $(this).val()
-    })
-
-    types.change(function() {
-        prop.type = $(this).val()
-    })
-
-    return set.append(input, types, button)
-}
-
-*/

@@ -20,10 +20,8 @@ application = webapp2.WSGIApplication([
 
     ('/practices', PracticesView),
     ('/practices/all', AllPractices),
-    ('/practices/save', SavePractice),
-    ('/practices/delete', DeletePractice),
-
-    ('/practice', SavePractice),
-    (r'/practice/(\d*)', SavePractice),
+    
+    ('/practice', UpdatePractice),
+    (r'/practice/(\d*)', UpdatePractice),
 
 ], debug=True)

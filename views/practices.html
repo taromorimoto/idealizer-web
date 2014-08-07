@@ -35,7 +35,7 @@
                 <option value="<%= practice.cid %>"><%= practice.isNew() ? 'Create new...' : practice.get('name') %></option>
             <% }) %>
         </select>
-        <button class="pure-button button-delete" type="button">Delete Practice</button>
+        <button class="pure-button button-delete hidden" type="button">Delete Practice</button>
         &nbsp;
         <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
     </form>
