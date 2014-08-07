@@ -4,8 +4,6 @@ $(function(){
      */
     Idea.Practice = Backbone.Model.extend({
 
-        urlRoot: '/practice',
-
         // Default attributes for a Practice.
         defaults: function() {
             return {
@@ -27,8 +25,10 @@ $(function(){
 
 
     Idea.PracticeCollection = Backbone.Collection.extend({
+        
         model: Idea.Practice,
-        url: '/practices/all',
+
+        url: '/practices',
 
         add: function(models, options) {
             _.each(models, function(model) {

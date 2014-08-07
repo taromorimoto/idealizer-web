@@ -2,26 +2,22 @@ import os
 import urllib
 
 import webapp2
-import jinja2
 
-from views.thing_view import *
-from views.practices import *
-from views.main_view import MainView
-from views.image_handler import ImageUploader
+from things import *
+from practices import *
+from main_view import MainView
+from image_handler import ImageUploader
 
 application = webapp2.WSGIApplication([
     ('/', MainView),
 
-    ('/new', NewThingView),
-    ('/create', NewThingView),
-    (r'/thing/(\d+)', ThingView),
-
     ('/upload', ImageUploader),
 
-    ('/practices', PracticesView),
-    ('/practices/all', AllPractices),
-    
-    ('/practice', UpdatePractice),
-    (r'/practice/(\d*)', UpdatePractice),
+    ('/new', NewThingView),
+
+    (r'/things/(\d+)', RESTThings),
+    (r'/practices/?(\d*)', RESTPractices),
 
 ], debug=True)
+
+

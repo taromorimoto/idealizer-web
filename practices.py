@@ -7,7 +7,8 @@ import json
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 
-from thing import ThingProperty
+from things import ThingProperty
+import helpers
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -47,73 +48,50 @@ class Practice(ndb.Model):
             'properties': [p.json() for p in self.properties]
         }
 
-class IdeaHTMLHandler(webapp2.RequestHandler):
+class RESTPractices(helpers.RequestHandler):
 
-    def r(self, key):
-        return self.request.get(key)
-
-    def set_headers(self):
-        self.response.headers['Content-Type'] = 'text/html'
-
-class IdeaJSONHandler(webapp2.RequestHandler):
-
-    def r(self, key):
-        return self.request.get(key)
-
-    def set_headers(self):
-        self.response.headers['Content-Type'] = 'application/json'
-
-class PracticesView(IdeaHTMLHandler):
-
-    def get(self):
-        self.set_headers()
-        self.response.write(template.render())
-
-class AllPractices(IdeaJSONHandler):
-
-    def get(self):
-        self.set_headers()
+    def get(self, id):
+        print self.request.headers['Accept']
+        if self.accepts_html():
+            self.respond_html()
+            self.response.write(template.render())
+            return
 
         values = []
         practices = Practice.all()
         for practice in practices:
             values.append(practice.json())
 
-        print values
+        self.respond_json()
         self.response.out.write(json.dumps(values))
 
-class UpdatePractice(IdeaJSONHandler):
-
-    def post(self):
-        self.set_headers()
-
-        print 'UpdatePractice (NEW):', self.request.body
+    def post(self, id):
+        print 'RESTPractices (NEW):', self.request.body
         practice = Practice.create(json.loads(self.request.body))
         practice.put()
 
+        self.respond_json()
         self.response.out.write(json.dumps({
             'id': practice.key.id()
         }))
 
     def put(self, id):
-        self.set_headers()
-
-        print 'UpdatePractice (UPDATE):', self.request.body
+        print 'RESTPractices (UPDATE):', self.request.body
         practice = Practice.get_by_id(int(id))
         practice.decode(json.loads(self.request.body))
         practice.put()
 
+        self.respond_json()
         self.response.out.write(json.dumps({
             'id': id
         }))
 
     def delete(self, id):
-        self.set_headers()
-
-        print 'UpdatePractice (DELETE):', self.request.body
+        print 'RESTPractices (DELETE):', self.request.body
         practice = Practice.get_by_id(int(id))
         practice.key.delete()
 
+        self.respond_json()
         self.response.out.write(json.dumps({
             'id': id
         }))

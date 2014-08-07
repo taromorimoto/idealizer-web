@@ -4,7 +4,7 @@ import urllib
 import webapp2
 import jinja2
 
-from thing import Thing
+from things import Thing
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
