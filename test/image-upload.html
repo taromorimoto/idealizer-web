@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Test Image Upload{% endblock %}
+
+{% block content %}
+
+<div id="image-upload"></div>
+
+{% endblock %}
+
+{% block script %}
+
+var view = new ImageUploadView({ el: '#image-upload', max: 3 })
+    
+{% endblock %}
+

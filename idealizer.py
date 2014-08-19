@@ -5,19 +5,19 @@ import webapp2
 
 from things import *
 from practices import *
-from main_view import MainView
+from landing import *
+from test.test import *
 from image_handler import ImageUploader
 
 application = webapp2.WSGIApplication([
-    ('/', MainView),
+    ('/', Landing),
 
     ('/upload', ImageUploader),
 
-    ('/new', NewThingView),
-
-    (r'/things/(\d+)', RESTThings),
+    (r'/?(\d*)/things/?(\d*)', RESTThings),
     (r'/practices/?(\d*)', RESTPractices),
 
+    (r'/test/(.+)', Test),
 ], debug=True)
 
 

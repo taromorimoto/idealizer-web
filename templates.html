@@ -1,0 +1,39 @@
+<script type="text/template" id="practice-selector-template">
+    <form class="pure-form">
+        <select>
+            <% _.each(practices, function(practice) { %>
+                <option value="<%= practice.cid %>" <% if (selected == practice.id) print('selected="selected"') %>>
+                    <%= practice.isNew() ? 'Create new...' : practice.get('name') %>
+                </option>
+            <% }) %>
+        </select>
+        <button class="pure-button button-delete hidden" type="button">Delete Practice</button>
+        &nbsp;
+        <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
+    </form>
+</script>
+
+<script type="text/template" id="image-upload-template">
+    <div class="pure-g idea-image-uploads">
+        <div class="pure-u-1-<%= cols %>">
+            <div class="idea-square-wrapper">
+                <div class="idea-square-container idea-upload-controls">
+                    <div>Upload images</div>
+                    <div class="max-images faded"></div>
+                    <button type="button" class="pure-button">
+                        <span>Select</span><i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
+                    </button>
+                    <input class="pure-button idea-image-upload" type="file" name="image" upload_url="{{ upload_url }}" multiple>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="uploaded-image-template">
+    <div class="pure-u-1-<%= cols %>">
+        <div class="idea-square-wrapper">
+            <div class="idea-square-container" key="<%= key %>" style="background-image: url(<%= url %>)"></div>
+        </div>
+    </div>
+</script>

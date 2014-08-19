@@ -1,4 +1,4 @@
-import webapp2
+import webapp2, json
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -7,9 +7,7 @@ from google.appengine.ext import blobstore
 
 import helpers
 
-thing_template = helpers.get_template('thing.html')
-new_thing_template = helpers.get_template('new_thing.html')
-
+things_template = helpers.get_template('things.html')
 
 class ThingProperty(ndb.Expando):
 	name = ndb.StringProperty()
@@ -37,8 +35,8 @@ class Thing(ndb.Model):
 	date = ndb.DateTimeProperty(auto_now_add=True)
 
 	@staticmethod
-	def all():
-		things_query = Thing.query().order(-Thing.date)
+	def all(practice_key=None):
+		things_query = Thing.query(ancestor=practice_key).order(-Thing.date)
 		return things_query.fetch(50)
 
 	def json(self):
@@ -51,20 +49,34 @@ class Thing(ndb.Model):
 
 class RESTThings(helpers.RequestHandler):
 
-    def get(self, id):
-        id = int(id)
+    def get(self, practice_id, id):
+        practice_id = practice_id if practice_id else self.request.cookies.get('practice_id')
+        print "practice_id=" + str(practice_id)
 
-        thing = Thing.get_by_id(id)
+    	# Get html page with things
+        if self.accepts_html() and not id:
+            self.respond_html()
+            self.response.write(things_template.render({
+            	'upload_url': blobstore.create_upload_url('/upload')
+        	}))
+            return
 
-        template_values = {}
-        template_values['thing'] = thing.values()
+        # Get one thing json
+        if id:
+	        thing = Thing.get_by_id(int(id))
+	        self.respond_json()
+	        self.response.out.write(json.dumps(thing))
 
+        # Get all things json
         self.respond_html()
-        self.response.write(thing_template.render(template_values))
+        print Thing.all()
+        self.response.write(json.dumps([thing.json() for thing in Thing.all()]))
 
-    def post(self, id):
+    def post(self, practice_id, id):
+        practice_id = practice_id if practice_id else self.request.cookies.get('practice_id')
         print 'RESTThings (NEW):', self.request.body
-        thing = Thing()
+
+        thing = Thing(ancestor=practice_id)
         thing.name = self.request.get('name')
         thing.description = self.request.get('description')
         thing.image = ndb.Blob(self.request.get('image'))
@@ -75,13 +87,4 @@ class RESTThings(helpers.RequestHandler):
             'id': thing.key.id()
         }))
 
-
-class NewThingView(webapp2.RequestHandler):
-
-    def get(self):
-        self.response.headers['Content-Type'] = 'text/html'
-        values = {
-            'upload_url': blobstore.create_upload_url('/upload')
-        }
-        self.response.write(new_thing_template.render(values))
 

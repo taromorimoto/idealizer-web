@@ -12,6 +12,7 @@ template = helpers.get_template('practices.html')
 class Practice(ndb.Model):
     author = ndb.UserProperty()
     name = ndb.StringProperty()
+    img = ndb.StringProperty()
     properties = ndb.StructuredProperty(ThingProperty, repeated=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -41,7 +42,6 @@ class Practice(ndb.Model):
 class RESTPractices(helpers.RequestHandler):
 
     def get(self, id):
-        print self.request.headers['Accept']
         if self.accepts_html():
             self.respond_html()
             self.response.write(template.render())
