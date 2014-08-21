@@ -12,6 +12,9 @@ textarea,
 button {
     outline: 0;
 }
+button[disabled] {
+    color: #999;
+}
 
 select {
     -webkit-appearance: menulist;
@@ -162,17 +165,19 @@ nav {
 }
 
 /* Image Upload component */
-.idea-image-uploads {
+.image-uploads {
     border-top: 1px solid #eee;
     margin: 10px 0;
 }
-    .idea-upload-controls {
-        padding: 5px;
+    .upload-controls {
         background-color: #fff;
         text-align: center;
     }
-        .idea-upload-controls input.idea-image-upload {
+        .upload-controls input[type=file] {
             display: none;
+        }
+        .upload-controls > div {
+            margin: 10px;
         }
 
 /* A form for modifying practices */
@@ -193,11 +198,19 @@ nav {
         height: 100%;
         background-size: cover;
         background-position: center;
-        overflow: hidden;
     }
-        .idea-square-container > * {
-            width: inherit;
-            height: initial;
+        .idea-square-container .delete {
+            position: absolute;
+            top: -0.5em;
+            right: -0.5em;
+            z-index: 1000;
+            width: 1em;
+            height: 1em;
+            padding: 2px 0 1px 2px;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 594px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
         }
 
 #things-grid {

@@ -5,8 +5,9 @@ var ImageUploadView = Backbone.View.extend({
     imageTemplate: _.template($('#uploaded-image-template').html()),
 
     events: {
-        'change input[type=file]'            : 'upload',
-        'click .idea-upload-controls button' : 'selectFiles'
+        'change input[type=file]'       : 'upload',
+        'click .upload-controls button' : 'selectFiles',
+        'click .delete'                 : 'delete'
     },
 
     initialize: function(options) {
@@ -28,15 +29,14 @@ var ImageUploadView = Backbone.View.extend({
     upload: function(e) {
         var self = this
         var files = e.target.files
-        if (this.max > 0 && this.max < _.size(this.images) + _.size(files)) {
-            var elem = this.$('.idea-upload-controls')
+        if (this.canUpload(_.size(files))) {
+            this.$('.error').removeClass('error')
+        } else {
+            var elem = this.$('.upload-controls')
             elem.removeClass('shake').width()
             elem.addClass('shake')
             this.$('.max-images').addClass('error')
             return
-        } else {
-            this.$('.error').removeClass('error')
-            this.$('.idea-upload-controls').removeClass('shake')
         }
 
         var data = new FormData()
@@ -78,21 +78,39 @@ var ImageUploadView = Backbone.View.extend({
             key: key,
             url: url
         }))
-        this.$('.idea-image-uploads > :last-child').before(image)
+        this.$('.image-uploads > :last-child').before(image)
+    },
+
+    delete: function(e) {
+        var images = this.$('.image-container')
+        var index = images.index($(e.target).closest('.image-container'))
+        this.images.splice(index, 1)
+        images.eq(index).remove()
+        this.updateMaxCount()
+    },
+
+    canUpload: function(count) {
+        return this.max == 0 || this.uploadsLeft() - count >= 0
+    },
+
+    uploadsLeft: function() {
+        return this.max == 0 ? Number.MAX_VALUE : this.max - this.images.length
     },
 
     updateMaxCount: function() {
-        if (this.max > 0) {        
-            this.$('.max-images').text('(max ' + (this.max - this.images.length) + ')')
+        if (this.max > 0) {
+            var left = this.uploadsLeft()
+            this.$('.max-images').text('(max ' + left + ')')
+            this.$('button').prop('disabled', left == 0)
         }
     },
 
     selectFiles: function() {
-        this.$('.idea-image-upload').click()
+        this.$('input[type=file]').click()
     },
 
     spinner: function(show) {
-        this.$('.idea-load-spin').toggle(show == true).prev().toggle(show != true)
+        this.$('.load-spin').toggle(show == true).prev().toggle(show != true)
     }
 
 })

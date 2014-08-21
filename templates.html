@@ -14,16 +14,18 @@
 </script>
 
 <script type="text/template" id="image-upload-template">
-    <div class="pure-g idea-image-uploads">
+    <div class="pure-g image-uploads">
         <div class="pure-u-1-<%= cols %>">
             <div class="idea-square-wrapper">
-                <div class="idea-square-container idea-upload-controls">
-                    <div>Upload images</div>
-                    <div class="max-images faded"></div>
-                    <button type="button" class="pure-button">
-                        <span>Select</span><i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
-                    </button>
-                    <input class="pure-button idea-image-upload" type="file" name="image" upload_url="{{ upload_url }}" multiple>
+                <div class="idea-square-container upload-controls">
+                    <div>
+                        Upload images
+                        <div class="max-images faded"></div>
+                        <button type="button" class="pure-button">
+                            <span>Select</span><i class="fa fa-refresh fa-spin hidden load-spin"></i>
+                        </button>
+                        <input class="pure-button" type="file" name="image" upload_url="{{ upload_url }}" multiple>
+                    </div>
                 </div>
             </div>
         </div>
@@ -31,9 +33,11 @@
 </script>
 
 <script type="text/template" id="uploaded-image-template">
-    <div class="pure-u-1-<%= cols %>">
+    <div class="pure-u-1-<%= cols %> image-container">
         <div class="idea-square-wrapper">
-            <div class="idea-square-container" key="<%= key %>" style="background-image: url(<%= url %>)"></div>
+            <div class="idea-square-container" key="<%= key %>" style="background-image: url(<%= url %>)">
+                <i class="fa fa-minus-circle delete"></i>
+            </div>
         </div>
     </div>
 </script>
