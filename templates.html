@@ -24,7 +24,7 @@
                         <button type="button" class="pure-button">
                             <span>Select</span><i class="fa fa-refresh fa-spin hidden load-spin"></i>
                         </button>
-                        <input class="pure-button" type="file" name="image" upload_url="{{ upload_url }}" multiple>
+                        <input class="pure-button" type="file" name="image" multiple>
                     </div>
                 </div>
             </div>
@@ -35,7 +35,7 @@
 <script type="text/template" id="uploaded-image-template">
     <div class="pure-u-1-<%= cols %> image-container">
         <div class="idea-square-wrapper">
-            <div class="idea-square-container" key="<%= key %>" style="background-image: url(<%= url %>)">
+            <div class="idea-square-container" blob_key="<%= blob_key %>" style="background-image: url(<%= url %>)">
                 <i class="fa fa-minus-circle delete"></i>
             </div>
         </div>

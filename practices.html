@@ -15,6 +15,11 @@
             <input type="text" class="practice-name" placeholder="Practice name..." value="<%= practice.name() %>" required>
         </fieldset>
 
+        <fieldset>
+            <label>Image</label>
+            <div id="idea-image-uploads"></div>
+        </fieldset>
+
         <legend>Properties</legend>
         <div id="edit-practice-properties"></div>
         <button class="pure-button button-add" type="button">Add new property</button>
@@ -30,8 +35,19 @@
 
 <script type="text/template" id="edit-practice-property-template">
     <fieldset>
-        <input type="text" name="property-name" value="<%= name %>" placeholder="Property name..." required>
-        <select name="property-type">
+        <input type="text" class="property-name" value="<%= name %>" placeholder="Property name..." required>
+
+        <% //var single = size == 1 ? 'selected' : '' %>
+        <% //var hidden = checked ? '' : 'hidden' %>
+
+        <select class="property-size-selector">
+            <option value="1">Single value</option>
+            <option value="">A list with size</option>
+            <option value="0">Unlimited list</option>
+        </select>
+        <input type="text" class="property-size" value="<%= size %>" placeholder="Size">
+        
+        <select class="property-type">
             <% _.each(types, function(t) { %>
                 <option value="<%= t %>" <% if (t == type) print('selected') %>><%= t %></option>
             <% }) %>

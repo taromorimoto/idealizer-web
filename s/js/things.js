@@ -122,7 +122,7 @@ var Things = {
                 this.propertyViews = []
                 _.each(this.model.properties(), this.appendProperty.bind(this))
 
-                this.images = new ImageUploadView({ el: this.$('#idea-image-uploads') })
+                this.images = new ImagesView({ el: this.$('#idea-image-uploads') })
 
                 return this
             },

@@ -7,7 +7,7 @@ from things import *
 from practices import *
 from landing import *
 from test.test import *
-from image_handler import ImageUploader
+from image import ImageUploader
 
 application = webapp2.WSGIApplication([
     ('/', Landing),

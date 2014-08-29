@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 
 from things import ThingProperty
+from image import Image
 import helpers
 
 template = helpers.get_template('practices.html')
@@ -12,7 +13,7 @@ template = helpers.get_template('practices.html')
 class Practice(ndb.Model):
     author = ndb.UserProperty()
     name = ndb.StringProperty()
-    img = ndb.StringProperty()
+    img = ndb.StructuredProperty(Image)
     properties = ndb.StructuredProperty(ThingProperty, repeated=True)
     date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -24,20 +25,33 @@ class Practice(ndb.Model):
     @classmethod
     def create(cls, data):
         obj = cls()
+        if data.has_key('img'):
+            obj.img = Image.create(data['img'])
         obj.name = data['name']
         obj.properties = [ThingProperty.decode(prop) for prop in data['properties']]
         return obj
 
     def decode(self, data):
         self.name = data['name']
+        if data.has_key('img'):
+            self.img = Image.create(data['img'])
+        else:
+            self.img = None
         self.properties = [ThingProperty.decode(prop) for prop in data['properties']]
 
     def json(self):
-        return {
+        values = {
             'key': self.key.id(),
             'name': self.name,
             'properties': [p.json() for p in self.properties]
         }
+        if self.img:
+            values['img'] = {
+                'blob_key': self.img.blob_key,
+                'url': self.img.url,
+            }
+
+        return values
 
 class RESTPractices(helpers.RequestHandler):
 

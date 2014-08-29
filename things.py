@@ -3,8 +3,6 @@ import webapp2, json
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-from google.appengine.ext import blobstore
-
 import helpers
 
 things_template = helpers.get_template('things.html')
@@ -13,12 +11,14 @@ class ThingProperty(ndb.Expando):
 	name = ndb.StringProperty()
 	type = ndb.StringProperty()
 	thing = ndb.KeyProperty(kind='Thing')
+	size = ndb.IntegerProperty(default=1) # 0 = unlimited list, 1 = singular, > 1 = list with size
 
 	@classmethod
 	def decode(cls, data):
 		obj = cls()
 		obj.name = data['name']
 		obj.type = data['type']
+		obj.size = data['size']
 		return obj
 
 	def json(self):
@@ -26,6 +26,7 @@ class ThingProperty(ndb.Expando):
 			'key': self.key.id() if self.key else '',
 			'name': self.name,
 			'type': self.type,
+			'size': self.size,
 		}
 
 class Thing(ndb.Model):
@@ -56,9 +57,7 @@ class RESTThings(helpers.RequestHandler):
     	# Get html page with things
         if self.accepts_html() and not id:
             self.respond_html()
-            self.response.write(things_template.render({
-            	'upload_url': blobstore.create_upload_url('/upload')
-        	}))
+            self.response.write(things_template.render())
             return
 
         # Get one thing json

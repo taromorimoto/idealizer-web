@@ -1,5 +1,5 @@
 
-var ImageUploadView = Backbone.View.extend({
+var ImagesView = Backbone.View.extend({
 
     template: _.template($('#image-upload-template').html()),
     imageTemplate: _.template($('#uploaded-image-template').html()),
@@ -13,17 +13,30 @@ var ImageUploadView = Backbone.View.extend({
     initialize: function(options) {
         _.defaults(this, options, {
             cols: 5,
-            max: 0
+            max: 0,
+            images: []
         })
-        this.images = []
+
+        this.fetchUploadUrl()
         this.render()
     },
 
     render: function() {
-        console.log('ImageUploadView.render')
+        console.log('ImagesView.render')
         this.$el.html(this.template({ cols: this.cols, max: this.max }))
+        _.each(this.images, this.showUploaded.bind(this))
+
         this.updateMaxCount()
         return this
+    },
+
+    fetchUploadUrl: function() {
+        var self = this
+        $.get('/upload').done(function(data) {
+            self.uploadUrl = data.upload_url
+        }).fail(function() {
+            console.log('Failed to fetch upload url')
+        })
     },
 
     upload: function(e) {
@@ -40,14 +53,14 @@ var ImageUploadView = Backbone.View.extend({
         }
 
         var data = new FormData()
-        $.each(files, function(key, value) {
+        $.each(files, function(blob_key, value) {
             data.append('file', value)
-            console.log('Uploading: ' + key + '=' + value)
+            console.log('Uploading: ' + blob_key + '=' + value)
         })
         this.spinner(true)
 
         $.ajax({
-            url: $(e.target).attr('upload_url'),
+            url: this.uploadUrl,
             type: 'POST',
             data: data,
             dataType: "json",
@@ -56,12 +69,12 @@ var ImageUploadView = Backbone.View.extend({
             contentType: false // Set content type to false as jQuery will tell the server its a query string request
         }).done(function(data, textStatus, jqXHR) {
             // Set a new server generated upload_url
-            $(e.target).attr('upload_url', data.upload_url)
+            self.uploadUrl = data.upload_url
 
             for (var i in data.files) {
                 var file = data.files[i]
                 console.log('Uploaded: ' + file.url)
-                self.showUploaded(file.url, file.key)
+                self.showUploaded(file)
                 self.images.push(file)
             }
             self.updateMaxCount()
@@ -72,11 +85,15 @@ var ImageUploadView = Backbone.View.extend({
         })
     },
 
-    showUploaded: function(url, key) {
+    json: function() {
+        return _.clone(this.images)
+    },
+
+    showUploaded: function(img) {
         var image = $(this.imageTemplate({
             cols: this.cols,
-            key: key,
-            url: url
+            blob_key: img.blob_key,
+            url: img.url
         }))
         this.$('.image-uploads > :last-child').before(image)
     },

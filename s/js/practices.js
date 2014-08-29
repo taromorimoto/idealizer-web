@@ -64,6 +64,7 @@ var Practices = {
 
             setModel: function(model) {
                 this.model = model
+                this.images.remove()
                 this.render()
             },
 
@@ -83,6 +84,12 @@ var Practices = {
                 this.propertyViews = []
                 _.each(this.model.properties(), this.appendProperty.bind(this))
 
+                this.images = new ImagesView({
+                    el: this.$('#idea-image-uploads'),
+                    max: 1,
+                    images: this.model.get('img') ? [this.model.get('img')] : []
+                })
+
                 return this
             },
 
@@ -93,7 +100,7 @@ var Practices = {
             },
 
             appendProperty: function(property) {
-                _.defaults(property, { type: '', name: '' });
+                _.defaults(property, { type: '', name: '', size: 1 });
                 var view = new Practices.PracticePropertyView({ property: property })
                 var index = this.propertyViews.length
                 this.propertyViews.push(view)
@@ -118,6 +125,10 @@ var Practices = {
             save: function() {
                 var self = this
                 var isNew = this.model.isNew()
+
+                // Get images
+                this.model.set('img', this.images.json()[0])
+
                 console.log('Saving Practice', this.model)
                 this.saveSpinner(true)
                 this.model.save()
@@ -141,9 +152,11 @@ var Practices = {
             types: ['text', 'textarea', 'select', 'radio', 'checkbox', 'image', 'video', 'link'],
 
             events: {
-                "change select"   : "setType",
-                "change input"   : "setName",
-                "click .button-delete"   : "remove"
+                "change .property-type" : "setType",
+                "change .property-name" : "setName",
+                "change .property-size" : "setSize",
+                "change .property-size-selector"  : "sizeSelectorChanged",
+                "click .button-delete"  : "remove"
             },
 
             initialize: function(options) {
@@ -153,6 +166,7 @@ var Practices = {
 
             render: function() {
                 this.$el.html(this.template(_.defaults({ types: this.types }, this.property)))
+                this.initSize()
             },
 
             setType: function(e) {
@@ -163,10 +177,28 @@ var Practices = {
                 this.property.name = $(e.target).val()
             },
 
+            initSize: function() {
+                var size = this.property.size
+                this.$('.property-size').val(size).toggle(size > 1)
+                this.$('.property-size-selector').val(size > 1 ? '' : size)
+            },
+
+            setSize: function() {
+                this.property.size = parseInt(this.$('.property-size').val())
+            },
+
+            sizeSelectorChanged: function() {
+                var size = parseInt(this.$('.property-size-selector').val())
+                if (isNaN(size)) size = 2
+                this.property.size = size
+                this.$('.property-size').val(size).toggle(size > 1)
+            },
+
             json: function() {
                 return {
                     name: this.$('input').val(),
-                    type: this.$('select').val()
+                    type: this.$('select').val(),
+                    size: this.$('select').val(),
                 }
             },
 

@@ -13,7 +13,7 @@ button {
     outline: 0;
 }
 button[disabled] {
-    color: #999;
+    color: #fff;
 }
 
 select {
@@ -63,7 +63,7 @@ nav {
     clear: both;
 }
 .hidden {
-    display: none;
+    display: none !important;
 }
 .faded {
     color: #999;
@@ -184,6 +184,9 @@ nav {
 #idea-practice-properties > fieldset > * {
     margin-right: 5px;
 }
+    .property-size {
+        width: 3.5em;
+    }
 
 /* Elements for making a grid with square elements */
 .idea-square-wrapper {
