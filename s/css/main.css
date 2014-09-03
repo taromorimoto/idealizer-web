@@ -63,7 +63,7 @@ nav {
     clear: both;
 }
 .hidden {
-    display: none !important;
+    display: none;
 }
 .faded {
     color: #999;
@@ -129,6 +129,7 @@ nav {
         display: block;
         text-decoration: none;
         color: #000;
+        text-align: center;
     }
     .idea-title {
         padding: 5px 3px;

@@ -18,7 +18,7 @@
             <div class="pure-u-1-5">
                 <div class="idea-thing">
                     <a href="/thing/<%= thing.id %>">
-                        <img class="pure-img" src="/s/img/learning_maths.jpg">
+                        <img class="pure-img" src="<%= thing.image() %>">
                     </a>
                     <div class="idea-title">
                         <a href="/thing/<%= thing.id %>"><%= thing.name() %></a>
@@ -37,12 +37,12 @@
 
             <fieldset class="pure-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Name..." required>
+                <input type="text" id="name" class="thing-name" placeholder="Name..." required>
             </fieldset>
 
             <div id="thing-properties"></div>
 
-            <button class="pure-button pure-button-primary" type="button">Save Thing</button>
+            <button class="pure-button pure-button-primary" type="button">Save</button>
             &nbsp;
             <i class="fa fa-refresh fa-spin hidden idea-load-spin"></i>
 
@@ -50,11 +50,32 @@
     </form>
 </script>
 
+<script type="text/template" id="text-property-template">
+    <fieldset class="pure-group">
+        <label><%= name %></label>
+        <% 
+        if (size > 1) {
+            for (var i = 0; i < size; i++) {
+                %><input type="text" index="<%= i %>" value="<%= value[i] %>" required><%
+            }
+        } else {
+            %><input type="text" value="<%= value %>" required><%
+        } %>
+    </fieldset>
+</script>
+
+<script type="text/template" id="image-property-template">
+    <fieldset>
+        <label><%= name %></label>
+        <div class="image-uploads"></div>
+    </fieldset>
+</script>
+
 {% endblock %}
 
 {% block script %}
+    idea.renderPracticeSelector()
     idea.loadThings()
     idea.renderThings()
-    idea.renderPracticeSelector()
 {% endblock %}
 

@@ -76,6 +76,7 @@ var ImagesView = Backbone.View.extend({
                 console.log('Uploaded: ' + file.url)
                 self.showUploaded(file)
                 self.images.push(file)
+                self.trigger('change', self.images)
             }
             self.updateMaxCount()
         }).fail(function(jqXHR, textStatus, errorThrown) {

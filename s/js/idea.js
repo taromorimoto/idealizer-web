@@ -58,6 +58,10 @@ Idea.prototype.renderPracticeSelector = function() {
     }.bind(this))
 }
 
+Idea.prototype.selectedPractice = function() {
+    return this.practices.get($.cookie('practice_id'))
+}
+
 Idea.prototype.loadThings = function() {
     Things.loadModelCollection()
     Things.loadViews()

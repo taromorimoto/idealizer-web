@@ -4,6 +4,8 @@ var Things = {
 
         Things.Thing = Backbone.Model.extend({
 
+            urlRoot: '/things',
+
             defaults: function() {
                 return {
                     key: '',
@@ -15,6 +17,17 @@ var Things = {
 
             name: function() {
                 return this.get('name')
+            },
+
+            image: function() {
+                var url
+                this.properties().some(function(p) {
+                     if (p.type == 'image' && p.value && p.value.length > 0) {
+                        url = p.value[0].url
+                        return true
+                     }
+                })
+                return url
             },
 
             properties: function() {
@@ -78,9 +91,17 @@ var Things = {
             },
 
             showCreateNew: function() {
-                if (this.editor) this.editor.setModel(new Things.Thing)
-                else this.editor =  new Things.EditThingView({ model: new Things.Thing })
-                //this.editor.animate()
+                var model = new Things.Thing({
+                    properties: idea.selectedPractice().properties()
+                })
+                if (this.editor) {
+                    this.editor.setModel(model)
+                } else {
+                    this.editor = new Things.EditThingView({
+                        model: model,
+                        collection: this.collection
+                    })
+                }
                 this.editor.$el.show().addClass('slide-in')
             }
         })
@@ -94,7 +115,6 @@ var Things = {
             events: {
                 "click button.close-edit-thing" : "close",
                 "click button:last"             : "save",
-                "click .button-add"             : "newProperty",
                 "change .thing-name"            : "setName"
             },
 
@@ -112,17 +132,15 @@ var Things = {
 
                 this.$el.html(this.template({ thing: this.model, practiceName: idea.practiceName() }))
 
-                this.$form = this.$('form').submit(function(e) {
+                this.$('form').submit(function(e) {
                     e.preventDefault()
                     e.stopPropagation()
                     return false
                 })
-                this.$properties = this.$('#edit-thing-properties')
+                this.$properties = this.$('#thing-properties')
 
                 this.propertyViews = []
                 _.each(this.model.properties(), this.appendProperty.bind(this))
-
-                this.images = new ImagesView({ el: this.$('#idea-image-uploads') })
 
                 return this
             },
@@ -138,90 +156,97 @@ var Things = {
             },
 
             appendProperty: function(property) {
-                _.defaults(property, { type: '', name: '' });
-                var view = new Things.ThingPropertyView({ property: property })
-                var index = this.propertyViews.length
-                this.propertyViews.push(view)
+                var view = new Things.PropertyViews[property.type]({ property: property })
                 this.$properties.append(view.$el)
-                this.listenTo(view, 'remove', function() {
-                    var properties = this.model.get('properties')
-                    index = properties.indexOf(property)
-                    console.log('Removing property at index ' + index, property)
-                    this.propertyViews.splice(index, 1)
-                    properties.splice(index, 1)
-                }.bind(this))
             },
 
             setName: function(e) {
                 this.model.set({ name: $(e.target).val() })
             },
 
-            saveSpinner: function(show) {
-                this.$form.find('.idea-load-spin:last').toggle(show == true)
+            spinner: function(show) {
+                this.$('.idea-load-spin:last').toggle(show == true)
             },
 
             save: function() {
                 var self = this
                 var isNew = this.model.isNew()
                 console.log('Saving Thing', this.model)
-                this.saveSpinner(true)
+                this.spinner(true)
                 this.model.save()
-                    .done(function() { 
-                        if (isNew) self.trigger('sync:new-model')
+                    .done(function(data) { 
+                        self.model.id = data.id
+                        self.model.set('key', data.id)
+                        if (isNew) self.collection.add(self.model)
                         console.log('Saved Thing ', self.model)
                     })
                     .fail(function() { 
                         console.log('Failed to save Thing ', self.model)
                     })
                     .always(function() {
-                        self.saveSpinner(false) 
+                        self.spinner(false) 
                     })
             }
         })
 
-/*
-        Things.ThingPropertyView = Backbone.View.extend({
+        Things.PropertyViews = {}
 
-            template: _.template($('#edit-Thing-property-template').html()),
-
-            types: ['text', 'textarea', 'select', 'radio', 'checkbox', 'image', 'video', 'link'],
+        Things.PropertyViews.text = Backbone.View.extend({
+            template: _.template($('#text-property-template').html()),
 
             events: {
-                "change select"   : "setType",
-                "change input"   : "setName",
-                "click .button-delete"   : "remove"
+                'change input' : 'changed'
             },
 
             initialize: function(options) {
+                _.defaults(options.property, { value: options.property.size > 1 ? [] : '' });
                 this.property = options.property
                 this.render()
             },
 
             render: function() {
-                this.$el.html(this.template(_.defaults({ types: this.types }, this.property)))
+                this.$el.html(this.template(this.property))
             },
 
-            setType: function(e) {
-                this.property.type = $(e.target).val()
-            },
-
-            setName: function(e) {
-                this.property.name = $(e.target).val()
-            },
-
-            json: function() {
-                return {
-                    name: this.$('input').val(),
-                    type: this.$('select').val()
+            changed: function(e) {
+                var value = $(e.target).val()
+                if (this.property.size > 1) {
+                    var index = parseInt($(e.target).attr('index'))
+                    this.property.value[index] = value
+                } else {
+                    this.property.value = value
                 }
-            },
-
-            remove: function() {
-                this.trigger('remove')
-                Backbone.View.prototype.remove.apply(this, arguments);
             }
         })
-        */
+
+        Things.PropertyViews.image = Backbone.View.extend({
+            template: _.template($('#image-property-template').html()),
+
+            events: {
+            },
+
+            initialize: function(options) {
+                _.defaults(options.property, { value: [] });
+                this.property = options.property
+                this.render()
+            },
+
+            render: function() {
+                this.$el.html(this.template(this.property))
+
+                this.images = new ImagesView({
+                    el: this.$('.image-uploads'),
+                    max: this.property.size,
+                    images: this.property.value
+                })
+
+                /*
+                this.listenTo(this.images, 'change', function(images) {
+                    this.property.length = 0
+                    _.extend(this.property, images)
+                })*/
+            }
+        })
 
     }
 }

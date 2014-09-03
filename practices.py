@@ -28,7 +28,7 @@ class Practice(ndb.Model):
         if data.has_key('img'):
             obj.img = Image.create(data['img'])
         obj.name = data['name']
-        obj.properties = [ThingProperty.decode(prop) for prop in data['properties']]
+        obj.properties = [ThingProperty.create(prop) for prop in data['properties']]
         return obj
 
     def decode(self, data):
@@ -37,7 +37,7 @@ class Practice(ndb.Model):
             self.img = Image.create(data['img'])
         else:
             self.img = None
-        self.properties = [ThingProperty.decode(prop) for prop in data['properties']]
+        self.properties = [ThingProperty.create(prop) for prop in data['properties']]
 
     def json(self):
         values = {

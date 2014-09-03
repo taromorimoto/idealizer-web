@@ -100,7 +100,7 @@ var Practices = {
             },
 
             appendProperty: function(property) {
-                _.defaults(property, { type: '', name: '', size: 1 });
+                _.defaults(property, { type: 'text', name: '', size: 1 });
                 var view = new Practices.PracticePropertyView({ property: property })
                 var index = this.propertyViews.length
                 this.propertyViews.push(view)
