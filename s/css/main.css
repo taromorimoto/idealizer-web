@@ -117,7 +117,7 @@ nav {
 }
 
 /* Displaying a things in a grid */
-.idea-thing {
+.thing {
     display: inline-block;
     margin: 5px;
     border-radius: 1px;
@@ -125,16 +125,16 @@ nav {
     background: #fff;
     overflow: hidden;
 }
-    .idea-thing a {
+    .thing a {
         display: block;
         text-decoration: none;
         color: #000;
         text-align: center;
     }
-    .idea-title {
+    .thing-name {
         padding: 5px 3px;
     }
-    .idea-thing img {
+    .thing img {
         display: block;
     }
 
@@ -221,7 +221,7 @@ nav {
     min-height: 1000px;
 }
 
-#edit-thing {
+.slider {
     position: absolute;
     background-color: inherit;
     right: 0;
@@ -236,7 +236,18 @@ nav {
     -webkit-backface-visibility:hidden;
     -webkit-perspective: 1000;
 }
-    #edit-thing.slide-in {
+    .slider.slide-in {
         -webkit-transform: translate3d(0,0,0);
         transform:         translate3d(0,0,0);
     }
+
+.image-scroller {
+    overflow: hidden;
+}
+    .image-scroller img {
+        margin: 10px;
+        width: 50%;
+    }
+
+
+

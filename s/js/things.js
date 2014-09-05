@@ -30,6 +30,10 @@ var Things = {
                 return url
             },
 
+            practice: function() {
+                return idea.practice(this.get('parent'))
+            },
+
             properties: function() {
                 return this.get('properties')
             }
@@ -64,7 +68,7 @@ var Things = {
 
             events: {
                 "click button.new-thing" : "showCreateNew",
-                "click .idea-thing"      : "showThing"
+                "click .thing a"      : "showThing"
             },
 
             initialize: function() {
@@ -83,11 +87,17 @@ var Things = {
                 return this
             },
 
-            showThing: function() {
-                this.model = this.selected()
-                console.log('Selected Thing', this.model)
-                this.$delete.toggle(!this.model.isNew())
-                this.trigger('select', this.model)
+            showThing: function(e) {
+                e.stopPropagation()
+                e.preventDefault()
+
+                var id = $(e.target).closest('.thing').attr('thing-id')
+                var model = this.collection.get(id)
+                console.log('Show Thing', model)
+                this.thingView = new Things.ThingView({ model: model })
+                this.thingView.$el.show().addClass('slide-in')
+
+                return false
             },
 
             showCreateNew: function() {
@@ -137,7 +147,7 @@ var Things = {
                     e.stopPropagation()
                     return false
                 })
-                this.$properties = this.$('#thing-properties')
+                this.$properties = this.$('.thing-properties')
 
                 this.propertyViews = []
                 _.each(this.model.properties(), this.appendProperty.bind(this))
@@ -156,7 +166,7 @@ var Things = {
             },
 
             appendProperty: function(property) {
-                var view = new Things.PropertyViews[property.type]({ property: property })
+                var view = new Things.EditPropertyViews[property.type]({ property: property })
                 this.$properties.append(view.$el)
             },
 
@@ -189,10 +199,10 @@ var Things = {
             }
         })
 
-        Things.PropertyViews = {}
+        Things.EditPropertyViews = {}
 
-        Things.PropertyViews.text = Backbone.View.extend({
-            template: _.template($('#text-property-template').html()),
+        Things.EditPropertyViews.text = Backbone.View.extend({
+            template: _.template($('#edit-text-property-template').html()),
 
             events: {
                 'change input' : 'changed'
@@ -219,8 +229,8 @@ var Things = {
             }
         })
 
-        Things.PropertyViews.image = Backbone.View.extend({
-            template: _.template($('#image-property-template').html()),
+        Things.EditPropertyViews.image = Backbone.View.extend({
+            template: _.template($('#edit-image-property-template').html()),
 
             events: {
             },
@@ -245,6 +255,82 @@ var Things = {
                     this.property.length = 0
                     _.extend(this.property, images)
                 })*/
+            }
+        })
+
+        /**
+         *  Thing details view
+         */
+        Things.ThingView = Backbone.View.extend({
+
+            el: '#thing-details',
+
+            template: _.template($('#thing-details-template').html()),
+
+            events: {
+                "click button.close-thing-details" : "close"
+            },
+
+            initialize: function(options) {
+                this.render()
+            },
+
+            setModel: function(model) {
+                this.model = model
+                this.render()
+            },
+
+            render: function() {
+                console.log('ThingView.render')
+
+                this.$el.html(this.template({ thing: this.model }))
+
+                this.$properties = this.$('.thing-properties')
+
+                this.propertyViews = []
+                _.each(this.model.properties(), this.appendProperty.bind(this))
+
+                return this
+            },
+
+            close: function() {
+                this.$el.removeClass('slide-in')
+            },
+
+            appendProperty: function(property) {
+                var view = new Things.PropertyViews[property.type]({ property: property })
+                this.$properties.append(view.$el)
+            }
+
+        })
+
+        Things.PropertyViews = {}
+
+        Things.PropertyViews.text = Backbone.View.extend({
+            template: _.template($('#text-property-template').html()),
+
+            initialize: function(options) {
+                _.defaults(options.property, { value: options.property.size > 1 ? [] : '' });
+                this.property = options.property
+                this.render()
+            },
+
+            render: function() {
+                this.$el.html(this.template(this.property))
+            }
+        })
+
+        Things.PropertyViews.image = Backbone.View.extend({
+            template: _.template($('#image-property-template').html()),
+
+            initialize: function(options) {
+                _.defaults(options.property, { value: [] });
+                this.property = options.property
+                this.render()
+            },
+
+            render: function() {
+                this.$el.html(this.template(this.property))
             }
         })
 

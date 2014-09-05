@@ -70,6 +70,7 @@ class Thing(ndb.Model):
 	def json(self):
 		return {
 			'key': self.key.id(),
+			'parent': self.key.parent().id(),
 			'name': self.name,
 			'date': time.mktime(self.date.timetuple()) * 1000,
 			'properties': self.json_properties(),

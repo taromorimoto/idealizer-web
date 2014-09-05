@@ -4,9 +4,11 @@
 
 {% block content %}
 
-<div id="edit-thing"></div>
+<div id="thing-details" class="slider"></div>
+<div id="edit-thing" class="slider"></div>
 <div id="things-grid"></div>
 
+<!-- Thing list view -->
 <script type="text/template" id="things-grid-template">
     <div><button class="pure-button button-add right new-thing">Make a new thing</button></div>
     <div class="clear"></div>
@@ -16,11 +18,11 @@
     <div class="pure-g">
         <% _.each(things, function(thing) { %>
             <div class="pure-u-1-5">
-                <div class="idea-thing">
+                <div class="thing" thing-id="<%= thing.id %>">
                     <a href="/thing/<%= thing.id %>">
                         <img class="pure-img" src="<%= thing.image() %>">
                     </a>
-                    <div class="idea-title">
+                    <div class="thing-name">
                         <a href="/thing/<%= thing.id %>"><%= thing.name() %></a>
                     </div>
                 </div>
@@ -29,6 +31,45 @@
     </div>
 </script>
 
+<!-- Thing details view -->
+<script type="text/template" id="thing-details-template">
+    <div><button class="pure-button right close-thing-details">Close</button></div>
+    <div>
+        <h3><%= thing.name() %> in <%= thing.practice().name() %></h3>
+
+        <div class="thing-properties"></div>
+    </div>
+</script>
+
+<script type="text/template" id="text-property-template">
+    <div>
+        <h4><%= name %></h4>
+        <% 
+        if (size > 1) {
+            for (var i = 0; i < size; i++) {
+                %><p><%= value[i] %></p><%
+            }
+        } else {
+            %><p><%= value %></p><%
+        } %>
+    </fieldset>
+</script>
+
+<script type="text/template" id="image-property-template">
+    <h4><%= name %></h4>
+    <div class="image-scroller">
+        <% 
+        if (size > 1) {
+            for (var i = 0; i < size; i++) {
+                if (value[i]) %><img src="<%= value[i].url %>"><%
+            }
+        } else {
+            if (value) %><img src="<%= value.url %>"><%
+        } %>
+    </div>
+</script>
+
+<!-- Edit Thing view -->
 <script type="text/template" id="edit-thing-template">
     <div><button class="pure-button right close-edit-thing">Close</button></div>
     <form class="pure-form pure-form-stacked idea-form">
@@ -40,7 +81,7 @@
                 <input type="text" id="name" class="thing-name" placeholder="Name..." required>
             </fieldset>
 
-            <div id="thing-properties"></div>
+            <div class="thing-properties"></div>
 
             <button class="pure-button pure-button-primary" type="button">Save</button>
             &nbsp;
@@ -50,7 +91,7 @@
     </form>
 </script>
 
-<script type="text/template" id="text-property-template">
+<script type="text/template" id="edit-text-property-template">
     <fieldset class="pure-group">
         <label><%= name %></label>
         <% 
@@ -64,7 +105,7 @@
     </fieldset>
 </script>
 
-<script type="text/template" id="image-property-template">
+<script type="text/template" id="edit-image-property-template">
     <fieldset>
         <label><%= name %></label>
         <div class="image-uploads"></div>

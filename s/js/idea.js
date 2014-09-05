@@ -12,8 +12,12 @@ Idea.prototype.init = function() {
     this.loadPractices()
 }
 
-Idea.prototype.practiceName = function() {
-    return this.practices.get($.cookie('practice_id')).get('name')
+Idea.prototype.practiceName = function(practice_id) {
+    return this.practices.get(practice_id || $.cookie('practice_id')).get('name')
+}
+
+Idea.prototype.practice = function(practice_id) {
+    return this.practices.get(practice_id)
 }
 
 Idea.prototype.loadPractices = function() {
