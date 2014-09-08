@@ -72,9 +72,9 @@ var Things = {
             },
 
             initialize: function() {
-                this.listenTo(this.collection, 'add', this.added)
-                this.listenTo(this.collection, 'destroy', this.destroyed)
-                this.listenTo(this.collection, 'sync', this.saved)
+                this.listenTo(this.collection, 'add', this.render)
+                this.listenTo(this.collection, 'destroy', this.render)
+                this.listenTo(this.collection, 'sync', this.render)
 
                 this.render()
             },
@@ -95,7 +95,7 @@ var Things = {
                 var model = this.collection.get(id)
                 console.log('Show Thing', model)
                 this.thingView = new Things.ThingView({ model: model })
-                this.thingView.$el.show().addClass('slide-in')
+                this.thingView.slideIn()
 
                 return false
             },
@@ -112,7 +112,7 @@ var Things = {
                         collection: this.collection
                     })
                 }
-                this.editor.$el.show().addClass('slide-in')
+                this.editor.slideIn()
             }
         })
 
@@ -123,7 +123,8 @@ var Things = {
             template: _.template($('#edit-thing-template').html()),
 
             events: {
-                "click button.close-edit-thing" : "close",
+                "click button.close-thing" : "slideOut",
+                "click button.delete-thing" : "delete",
                 "click button:last"             : "save",
                 "change .thing-name"            : "setName"
             },
@@ -155,8 +156,28 @@ var Things = {
                 return this
             },
 
-            close: function() {
+            slideIn: function() {
+                this.$el.show().addClass('slide-in')
+            },
+
+            slideOut: function() {
                 this.$el.removeClass('slide-in')
+            },
+
+            delete: function() {
+                var self = this
+                this.spinner(true)
+                this.model.destroy()
+                    .done(function() {
+                        console.log('Thing deleted', self.model)
+                        self.slideOut()
+                    })
+                    .fail(function() { 
+                        console.log('Failed to delete Thing ', self.model)
+                    })
+                    .always(function() {
+                        self.spinner(false) 
+                    })
             },
 
             newProperty: function() {
@@ -181,14 +202,16 @@ var Things = {
             save: function() {
                 var self = this
                 var isNew = this.model.isNew()
-                console.log('Saving Thing', this.model)
+                console.log('Saving Thing, isNew=', isNew, this.model)
                 this.spinner(true)
                 this.model.save()
                     .done(function(data) { 
-                        self.model.id = data.id
-                        self.model.set('key', data.id)
-                        if (isNew) self.collection.add(self.model)
-                        console.log('Saved Thing ', self.model)
+                        if (isNew) {
+                            self.model.id = data.id
+                            self.model.set('key', data.id)
+                            self.collection.add(self.model)
+                        }
+                        console.log('Saved Thing', self.model.id)
                     })
                     .fail(function() { 
                         console.log('Failed to save Thing ', self.model)
@@ -249,12 +272,6 @@ var Things = {
                     max: this.property.size,
                     images: this.property.value
                 })
-
-                /*
-                this.listenTo(this.images, 'change', function(images) {
-                    this.property.length = 0
-                    _.extend(this.property, images)
-                })*/
             }
         })
 
@@ -268,15 +285,18 @@ var Things = {
             template: _.template($('#thing-details-template').html()),
 
             events: {
-                "click button.close-thing-details" : "close"
+                "click button.close-thing" : "slideOut",
+                "click button.edit-thing" : "edit"
             },
 
             initialize: function(options) {
                 this.render()
+                this.listenTo(this.model, 'destroy', this.slideOut.bind(this))
             },
 
             setModel: function(model) {
                 this.model = model
+                this.listenTo(this.model, 'destroy', this.slideOut.bind(this))
                 this.render()
             },
 
@@ -293,7 +313,19 @@ var Things = {
                 return this
             },
 
-            close: function() {
+            edit: function() {
+                this.editor = new Things.EditThingView({
+                    model: this.model,
+                    collection: this.model.collection
+                })
+                this.editor.slideIn()
+            },
+
+            slideIn: function() {
+                this.$el.show().addClass('slide-in')
+            },
+
+            slideOut: function() {
                 this.$el.removeClass('slide-in')
             },
 

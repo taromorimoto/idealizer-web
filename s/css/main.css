@@ -1,3 +1,9 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
 body {
     background: #fff;
 }
@@ -58,6 +64,9 @@ nav {
 }
 .right {
     float: right;
+}
+.center {
+    text-align: center;
 }
 .clear {
     clear: both;
@@ -124,6 +133,7 @@ nav {
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.15);
     background: #fff;
     overflow: hidden;
+    font-size: 14px;
 }
     .thing a {
         display: block;
@@ -228,6 +238,8 @@ nav {
     left: 0;
     padding: inherit;
     border-left: 10px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0px 10px 40px rgba(0,0,0,0.1);
 
     -webkit-transform: translate3d(100%,0,0);
     transform:         translate3d(100%,0,0);
@@ -242,12 +254,35 @@ nav {
     }
 
 .image-scroller {
-    overflow: hidden;
+    white-space: nowrap;
+    overflow-x: scroll;
 }
     .image-scroller img {
-        margin: 10px;
-        width: 50%;
+        border-right: 1px solid transparent;
+        height: 200px;
     }
 
+.thing-property {
+    margin: 15px 0;
+}
+    .thing-property .thing-property-name {
+        text-align: right;
+        padding-right: 10px;
+        border-right: 1px solid #7AC94D;
+    }
+    .thing-property .thing-property-value {
+        padding-left: 10px;
+    }
 
+.thing-property-vertical {
+    margin: 10px 0;
+}
+    .thing-property-vertical .thing-property-name {
+        text-align: center;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #7AC94D;
+    }
+    .thing-property-vertical .thing-property-value {
+        margin-top: 5px;
+    }
 
