@@ -19,6 +19,10 @@ var Things = {
                 return this.get('name')
             },
 
+            time: function() {
+                return humanized_time_span(this.get('date') || new Date())
+            },
+
             image: function() {
                 var url
                 this.properties().some(function(p) {
@@ -31,7 +35,7 @@ var Things = {
             },
 
             practice: function() {
-                return idea.practice(this.get('parent'))
+                return idea.practice(this.get('parent_key'))
             },
 
             properties: function() {
@@ -82,7 +86,7 @@ var Things = {
             render: function() {
                 console.log('ThingsGridView.render')
 
-                this.$el.html(this.template({ things: this.collection.models }))
+                this.$el.html(this.template({ things: this.collection.models, practice: idea.practice() }))
 
                 return this
             },
@@ -212,6 +216,7 @@ var Things = {
                             self.collection.add(self.model)
                         }
                         console.log('Saved Thing', self.model.id)
+                        self.slideOut()
                     })
                     .fail(function() { 
                         console.log('Failed to save Thing ', self.model)
@@ -291,12 +296,16 @@ var Things = {
 
             initialize: function(options) {
                 this.render()
+                this.stopListening()
                 this.listenTo(this.model, 'destroy', this.slideOut.bind(this))
+                this.listenTo(this.model, 'sync', this.render.bind(this))
             },
 
             setModel: function(model) {
                 this.model = model
+                this.stopListening()
                 this.listenTo(this.model, 'destroy', this.slideOut.bind(this))
+                this.listenTo(this.model, 'sync', this.render.bind(this))
                 this.render()
             },
 

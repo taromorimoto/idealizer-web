@@ -10,8 +10,13 @@
 
 <!-- Thing list view -->
 <script type="text/template" id="things-grid-template">
-    <div><button class="pure-button button-add right new-thing">Make a new thing</button></div>
-    <div class="clear"></div>
+    <div class="top-right-buttons">
+        <button class="pure-button button-add new-thing">Make a new thing</button>
+    </div>
+
+    <h3 class="center">
+        Things in <%= practice.name() %>
+    </h3>
     <% if (_.isEmpty(things)) { %>
         <p>There are no things yet, make some!</p>
     <% } %>
@@ -23,7 +28,10 @@
                         <img class="pure-img" src="<%= thing.image() %>">
                     </a>
                     <div class="thing-name">
-                        <a href="/thing/<%= thing.id %>"><%= thing.name() %></a>
+                        <a href="/thing/<%= thing.id %>">
+                            <div><%= thing.name() %></div>
+                            <div class="time grey"><%= thing.time() %></div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -33,12 +41,15 @@
 
 <!-- Thing details view -->
 <script type="text/template" id="thing-details-template">
-    <div class="right">
+    <div class="top-right-buttons">
         <button class="pure-button button-add edit-thing">Edit</button>
         <button class="pure-button close-thing">Close</button>
     </div>
     <div>
-        <h3><%= thing.name() %> in <%= thing.practice().name() %></h3>
+        <h3 class="center">
+            <%= thing.name() %>
+            <div>in <%= thing.practice().name() %> - <%= thing.time() %></div>
+        </h3>
 
         <div class="thing-properties"></div>
     </div>
@@ -80,8 +91,8 @@
 
 <!-- Edit Thing view -->
 <script type="text/template" id="edit-thing-template">
-    <div class="right">
-        <button class="pure-button button-delete delete-thing">Delete</button>
+    <div class="top-right-buttons">
+        <% if (!thing.isNew()) { %><button class="pure-button button-delete delete-thing">Delete</button><% } %>
         <button class="pure-button close-thing">Close</button>
     </div>
 

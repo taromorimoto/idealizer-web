@@ -17,7 +17,7 @@ Idea.prototype.practiceName = function(practice_id) {
 }
 
 Idea.prototype.practice = function(practice_id) {
-    return this.practices.get(practice_id)
+    return this.practices.get(practice_id || $.cookie('practice_id'))
 }
 
 Idea.prototype.loadPractices = function() {

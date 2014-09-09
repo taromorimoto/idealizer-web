@@ -19,16 +19,15 @@ class ThingProperty(ndb.Expando):
         obj.name = data['name']
         obj.type = data['type']
         obj.size = data['size']
-        obj.decode_value(data['value'])
+        if 'value' in data:
+	        obj.decode_value(data['value'])
         return obj
 
     @classmethod
     def get_and_update_value(cls, parent_key, data):
-    	print data['key']
-    	print parent_key
         obj = cls.get_by_id(data['key'], parent=parent_key)
-        print obj
-        obj.decode_value(data['value'])
+        if 'value' in data:
+	        obj.decode_value(data['value'])
         return obj
 
     def decode_value(self, value):
@@ -89,7 +88,7 @@ class Thing(ndb.Model):
     def json(self):
         return {
             'key': self.key.id(),
-            'parent': self.key.parent().id(),
+            'parent_key': self.key.parent().id(),
             'name': self.name,
             'date': time.mktime(self.date.timetuple()) * 1000,
             'properties': self.json_properties(),
@@ -127,7 +126,8 @@ class RESTThings(helpers.RequestHandler):
 
         self.respond_json()
         self.response.out.write(json.dumps({
-            'id': thing.key.id()
+            'id': thing.key.id(),
+            'parent_key': practice_id,
         }))
 
     def put(self, practice_id, id):
