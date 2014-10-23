@@ -1,4 +1,11 @@
-var Things = {
+/*jshint asi: true, supernew: true, jquery: true*/
+/*globals window, console, _, Backbone, Practices, idea, humanized_time_span, ImagesView */
+
+var Things = (function() {
+
+"use strict";
+
+return {
 
     loadModelCollection: function() {
 
@@ -200,7 +207,7 @@ var Things = {
             },
 
             spinner: function(show) {
-                this.$('.idea-load-spin:last').toggle(show == true)
+                this.$('.idea-load-spin:last').toggle(show === true)
             },
 
             save: function() {
@@ -377,3 +384,5 @@ var Things = {
 
     }
 }
+
+})()

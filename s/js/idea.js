@@ -1,3 +1,9 @@
+/*jshint asi: true, supernew: true, jquery: true*/
+/*globals window, _, Backbone, Practices, Things */
+
+var Idea = (function() {
+
+"use strict";
 
 var Idea = function() {
 }
@@ -80,3 +86,5 @@ Idea.prototype.renderThings = function() {
     }.bind(this))
 }
 
+return Idea
+})()

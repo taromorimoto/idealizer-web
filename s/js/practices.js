@@ -1,4 +1,11 @@
-var Practices = {
+/*jshint asi: true, supernew: true, jquery: true*/
+/*globals window, console, alert, FormData, _, Backbone, idea, humanized_time_span, ImagesView */
+
+var Practices = (function() {
+
+"use strict";
+
+return {
 
     loadModelCollection: function() {
         /**
@@ -119,7 +126,7 @@ var Practices = {
             },
 
             saveSpinner: function(show) {
-                this.$form.find('.idea-load-spin:last').toggle(show == true)
+                this.$form.find('.idea-load-spin:last').toggle(show === true)
             },
 
             save: function() {
@@ -291,8 +298,11 @@ var Practices = {
             },
 
             spinner: function(show) {
-                this.$('.idea-load-spin').toggle(show == true)
+                this.$('.idea-load-spin').toggle(show === true)
             }
         })
     }
 }
+
+})()
+

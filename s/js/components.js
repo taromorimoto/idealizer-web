@@ -1,5 +1,11 @@
+/*jshint asi: true, supernew: true, jquery: true*/
+/*globals window, console, alert, FormData, _, Backbone, Practices, idea, humanized_time_span */
 
-var ImagesView = Backbone.View.extend({
+var ImagesView = (function() {
+
+"use strict";
+
+return Backbone.View.extend({
 
     template: _.template($('#image-upload-template').html()),
     imageTemplate: _.template($('#uploaded-image-template').html()),
@@ -108,18 +114,18 @@ var ImagesView = Backbone.View.extend({
     },
 
     canUpload: function(count) {
-        return this.max == 0 || this.uploadsLeft() - count >= 0
+        return this.max === 0 || this.uploadsLeft() - count >= 0
     },
 
     uploadsLeft: function() {
-        return this.max == 0 ? Number.MAX_VALUE : this.max - this.images.length
+        return this.max === 0 ? Number.MAX_VALUE : this.max - this.images.length
     },
 
     updateMaxCount: function() {
         if (this.max > 0) {
             var left = this.uploadsLeft()
             this.$('.max-images').text('(max ' + left + ')')
-            this.$('button').prop('disabled', left == 0)
+            this.$('button').prop('disabled', left === 0)
         }
     },
 
@@ -128,9 +134,9 @@ var ImagesView = Backbone.View.extend({
     },
 
     spinner: function(show) {
-        this.$('.load-spin').toggle(show == true).prev().toggle(show != true)
+        this.$('.load-spin').toggle(show === true).prev().toggle(show !== true)
     }
 
 })
 
-
+})()
